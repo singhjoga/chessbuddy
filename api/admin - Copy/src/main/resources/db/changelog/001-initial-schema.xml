@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="joga" id="001.01">
+        <createTable tableName="WORK">
+            <column name="ID" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="WORK_PK"/>
+            </column>
+            <column name="NAME" type="VARCHAR(500)"/>
+            <column name="DESCRIPTION" type="VARCHAR(3000)"/>
+            <column name="CREATE_USER" type="VARCHAR(100)"/>
+            <column name="IS_DISABLED" type="boolean" defaultValueBoolean="false"/>
+            <column name="CREATE_DATE" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+	<changeSet id="table-auditlog" author="joga.singh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="AUDIT_LOG" />
+			</not>
+		</preConditions>
+		<createTable tableName="AUDIT_LOG">
+			<column name="AUDIT_ID" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="AUDIT_LOG_PK" />
+			</column>
+			<column name="ACTION" type="VARCHAR2(20 BYTE)" />
+			<column name="ACTION_DATE" type="timestamp" />
+			<column name="ACTION_USER" type="VARCHAR2(100 BYTE)" />
+			<column name="OBJ_TYPE" type="VARCHAR2(100 BYTE)" />
+			<column name="OBJ_ID" type="VARCHAR2(100 BYTE)" />
+			<column name="OBJ_NAME" type="VARCHAR2(500 BYTE)" />
+			<column name="FILTER_VALUE" type="VARCHAR2(500 BYTE)" />
+			<column name="ACTION_DETAILS" type="CLOB" />
+		</createTable>
+		<createIndex indexName="AUDIT_LOG_IDX1"
+			tableName="AUDIT_LOG">
+			<column name="ACTION" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX2"
+			tableName="AUDIT_LOG">
+			<column name="ACTION_DATE" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX3"
+			tableName="AUDIT_LOG">
+			<column name="ACTION_USER" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX4"
+			tableName="AUDIT_LOG">
+			<column name="OBJ_TYPE" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX5"
+			tableName="AUDIT_LOG">
+			<column name="OBJ_ID" />
+		</createIndex>
+	</changeSet>
+</databaseChangeLog>

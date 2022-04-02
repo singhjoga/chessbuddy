@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_tCltYJ1uEeyi5_Nv0mR0aQ" name="papyrus-model">
+  <packageImport xmi:type="uml:PackageImport" xmi:id="_tHliIJ1uEeyi5_Nv0mR0aQ">
+    <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+  </packageImport>
+  <packagedElement xmi:type="uml:Class" xmi:id="_xKuncJ1uEeyi5_Nv0mR0aQ" name="Organization">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_cDvF8J12Eeyi5_Nv0mR0aQ" name="Name"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_UCCq8513Eeyi5_Nv0mR0aQ" name="personmembership" type="_Icm44J13Eeyi5_Nv0mR0aQ" association="_UCCq8J13Eeyi5_Nv0mR0aQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_UCCq9J13Eeyi5_Nv0mR0aQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_UCCq9Z13Eeyi5_Nv0mR0aQ" value="1"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_vFb_0513Eeyi5_Nv0mR0aQ" name="service" type="_3XnAcJ1uEeyi5_Nv0mR0aQ" association="_vFb_0J13Eeyi5_Nv0mR0aQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vFb_1J13Eeyi5_Nv0mR0aQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vFb_1Z13Eeyi5_Nv0mR0aQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_3XnAcJ1uEeyi5_Nv0mR0aQ" name="Service"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_7TJo8J1uEeyi5_Nv0mR0aQ" name="Person">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_PoVfw513Eeyi5_Nv0mR0aQ" name="personmembership" type="_Icm44J13Eeyi5_Nv0mR0aQ" association="_PoVfwJ13Eeyi5_Nv0mR0aQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_PoVfxJ13Eeyi5_Nv0mR0aQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_PoVfxZ13Eeyi5_Nv0mR0aQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Enumeration" xmi:id="_sjsqkJ1xEeyi5_Nv0mR0aQ" name="Role">
+    <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r7SKQJ1yEeyi5_Nv0mR0aQ" name="OrgAdministrator"/>
+    <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_umDHYJ1yEeyi5_Nv0mR0aQ" name="ServiceMan"/>
+    <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_wVhg8J1yEeyi5_Nv0mR0aQ" name="ServiceCoordinator"/>
+    <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_zOTr8J1yEeyi5_Nv0mR0aQ" name="ServiceTaker"/>
+    <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_z3azAJ11Eeyi5_Nv0mR0aQ" name="SysAdministrator"/>
+    <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_tjceEJ12Eeyi5_Nv0mR0aQ" name="OrgLocAdministrator"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_Icm44J13Eeyi5_Nv0mR0aQ" name="PersonOrgMembership"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_PoVfwJ13Eeyi5_Nv0mR0aQ" memberEnd="_PoVfw513Eeyi5_Nv0mR0aQ _PoVfxp13Eeyi5_Nv0mR0aQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PoVfwZ13Eeyi5_Nv0mR0aQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PoVfwp13Eeyi5_Nv0mR0aQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_PoVfxp13Eeyi5_Nv0mR0aQ" name="person" type="_7TJo8J1uEeyi5_Nv0mR0aQ" association="_PoVfwJ13Eeyi5_Nv0mR0aQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_UCCq8J13Eeyi5_Nv0mR0aQ" memberEnd="_UCCq8513Eeyi5_Nv0mR0aQ _UCCq9p13Eeyi5_Nv0mR0aQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_UCCq8Z13Eeyi5_Nv0mR0aQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UCCq8p13Eeyi5_Nv0mR0aQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_UCCq9p13Eeyi5_Nv0mR0aQ" name="organization" type="_xKuncJ1uEeyi5_Nv0mR0aQ" association="_UCCq8J13Eeyi5_Nv0mR0aQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_e11ksJ13Eeyi5_Nv0mR0aQ" name="OrgLocation">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_qD4xg513Eeyi5_Nv0mR0aQ" name="personorgmembership" type="_Icm44J13Eeyi5_Nv0mR0aQ" association="_qD4xgJ13Eeyi5_Nv0mR0aQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_qD4xhJ13Eeyi5_Nv0mR0aQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_qD4xhZ13Eeyi5_Nv0mR0aQ" value="1"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_r7VbU513Eeyi5_Nv0mR0aQ" name="service" type="_3XnAcJ1uEeyi5_Nv0mR0aQ" association="_r7VbUJ13Eeyi5_Nv0mR0aQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_r7VbVJ13Eeyi5_Nv0mR0aQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_r7VbVZ13Eeyi5_Nv0mR0aQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_qD4xgJ13Eeyi5_Nv0mR0aQ" memberEnd="_qD4xg513Eeyi5_Nv0mR0aQ _qD4xhp13Eeyi5_Nv0mR0aQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qD4xgZ13Eeyi5_Nv0mR0aQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qD4xgp13Eeyi5_Nv0mR0aQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_qD4xhp13Eeyi5_Nv0mR0aQ" name="orglocation" type="_e11ksJ13Eeyi5_Nv0mR0aQ" association="_qD4xgJ13Eeyi5_Nv0mR0aQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_r7VbUJ13Eeyi5_Nv0mR0aQ" memberEnd="_r7VbU513Eeyi5_Nv0mR0aQ _r7VbVp13Eeyi5_Nv0mR0aQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_r7VbUZ13Eeyi5_Nv0mR0aQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r7VbUp13Eeyi5_Nv0mR0aQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_r7VbVp13Eeyi5_Nv0mR0aQ" name="orglocation" type="_e11ksJ13Eeyi5_Nv0mR0aQ" association="_r7VbUJ13Eeyi5_Nv0mR0aQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_vFb_0J13Eeyi5_Nv0mR0aQ" memberEnd="_vFb_0513Eeyi5_Nv0mR0aQ _vFb_1p13Eeyi5_Nv0mR0aQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vFb_0Z13Eeyi5_Nv0mR0aQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vFb_0p13Eeyi5_Nv0mR0aQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_vFb_1p13Eeyi5_Nv0mR0aQ" name="organization" type="_xKuncJ1uEeyi5_Nv0mR0aQ" association="_vFb_0J13Eeyi5_Nv0mR0aQ"/>
+  </packagedElement>
+</uml:Model>
