@@ -1,0 +1,12 @@
+code,typecode,displayorder
+sex_type,NULL,0
+male,sex_type,2
+female,sex_type,1
+sex_other,sex_type,3
+sex_unknown,sex_type,0
+reg_questions,NULL,0
+fav_color,reg_questions,
+fav_pet,reg_questions,
+fav_food,reg_questions,
+mother_nickname,reg_questions,
+father_nichname,reg_questions,

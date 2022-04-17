@@ -1,0 +1,199 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+	<changeSet id="01.01" author="joga.singh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="AUDIT_LOG" />
+			</not>
+		</preConditions>
+		<createTable tableName="AUDIT_LOG">
+			<column name="AUDIT_ID" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="AUDIT_LOG_PK" />
+			</column>
+			<column name="ACTION" type="VARCHAR2(20 BYTE)" />
+			<column name="ACTION_DATE" type="timestamp" />
+			<column name="ACTION_USER" type="VARCHAR2(100 BYTE)" />
+			<column name="OBJ_TYPE" type="VARCHAR2(100 BYTE)" />
+			<column name="OBJ_ID" type="VARCHAR2(100 BYTE)" />
+			<column name="OBJ_NAME" type="VARCHAR2(500 BYTE)" />
+			<column name="FILTER_VALUE" type="VARCHAR2(500 BYTE)" />
+			<column name="ACTION_DETAILS" type="CLOB" />
+		</createTable>
+		<createIndex indexName="AUDIT_LOG_IDX1"
+			tableName="AUDIT_LOG">
+			<column name="ACTION" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX2"
+			tableName="AUDIT_LOG">
+			<column name="ACTION_DATE" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX3"
+			tableName="AUDIT_LOG">
+			<column name="ACTION_USER" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX4"
+			tableName="AUDIT_LOG">
+			<column name="OBJ_TYPE" />
+		</createIndex>
+		<createIndex indexName="AUDIT_LOG_IDX5"
+			tableName="AUDIT_LOG">
+			<column name="OBJ_ID" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="01.02" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="REF_DATA" />
+			</not>
+		</preConditions>
+		<createTable tableName="REF_DATA">
+			<column name="CODE" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="REF_DATA_PK" />
+			</column>
+			<column name="TYPE_CODE" type="VARCHAR2(100 BYTE)">
+				<constraints foreignKeyName="REF_DATA_FK1"
+					references="REF_DATA(CODE)" />
+			</column>
+			<column name="IS_DISABLED" type="BOOLEAN"
+				defaultValueBoolean="false" />
+			<column name="DISPLAY_ORDER" type="INT"
+				defaultValueNumeric="0" />
+		</createTable>
+		<createIndex indexName="REF_DATA_IDX1"
+			tableName="REF_DATA">
+			<column name="TYPE_CODE" />
+		</createIndex>
+	</changeSet>
+	<changeSet id="01.03" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="LANG" />
+			</not>
+		</preConditions>
+		<createTable tableName="LANG">
+			<column name="CODE" type="VARCHAR2(20 BYTE)">
+				<constraints primaryKey="true" primaryKeyName="LANG_PK" />
+			</column>
+			<column name="ENG_NAME" type="VARCHAR2(100 BYTE)" />
+			<column name="LOCAL_NAME" type="VARCHAR2(100 BYTE)" />
+			<column name="IS_DISABLED" type="BOOLEAN"
+				defaultValueBoolean="false" />
+		</createTable>
+	</changeSet>
+
+	<changeSet id="01.04" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="REF_DATA_VAL" />
+			</not>
+		</preConditions>
+		<createTable tableName="REF_DATA_VAL">
+			<column name="CODE" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="REF_DATA_VAL_PK" />
+			</column>
+			<column name="LANG_CODE" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="REF_DATA_VAL_PK" foreignKeyName="REF_DATA_VAL_FK1"
+					referencedTableName="LANG" referencedColumnNames="CODE" />
+			</column>
+			<column name="VALUE" type="VARCHAR2(100 BYTE)" />
+			<column name="DESCRIPTION" type="VARCHAR2(3000 BYTE)" />
+		</createTable>
+	</changeSet>
+	<changeSet id="01.05" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="COUNTRY" />
+			</not>
+		</preConditions>
+		<createTable tableName="COUNTRY">
+			<column name="CODE" type="VARCHAR2(20 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="COUNTRY_PK" />
+			</column>
+			<column name="ENG_NAME" type="VARCHAR2(500 BYTE)" />
+			<column name="DEF_LANG_CODE" type="VARCHAR2(100 BYTE)">
+				<constraints foreignKeyName="COUNTRY_LANG_FK1"
+					referencedTableName="LANG" referencedColumnNames="CODE" />
+			</column>
+			<column name="DATE_FORMAT" type="VARCHAR2(100 BYTE)" />
+		</createTable>
+	</changeSet>
+	<changeSet id="01.06" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="COUNTRY_NAME" />
+			</not>
+		</preConditions>
+		<createTable tableName="COUNTRY_NAME">
+			<column name="CODE" type="VARCHAR2(20 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="COUNTRY_VAL_PK" />
+			</column>
+			<column name="LANG_CODE" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true"
+					primaryKeyName="COUNTRY_VAL_PK" foreignKeyName="COUNTRY_VAL_FK1"
+					referencedTableName="LANG" referencedColumnNames="CODE" />
+			</column>
+			<column name="LOCAL_NAME" type="VARCHAR2(500 BYTE)" />
+		</createTable>
+	</changeSet>
+	<changeSet id="01.07" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="PLAYER" />
+			</not>
+		</preConditions>
+		<createTable tableName="PLAYER">
+			<column name="ID" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true" primaryKeyName="CUST_PK" />
+			</column>
+			<column name="USERNAME" type="VARCHAR2(50 BYTE)" />
+			<column name="PASSWD" type="VARCHAR2(500 BYTE)" />
+			<column name="FIRST_NAME" type="VARCHAR2(500 BYTE)" />
+			<column name="LAST_NAME" type="VARCHAR2(500 BYTE)" />
+			<column name="EMAIL" type="VARCHAR2(500 BYTE)">
+				<constraints unique="true"
+					uniqueConstraintName="CUST_EMAIL_UK" />
+			</column>
+			<column name="LANG_CODE" type="VARCHAR2(100 BYTE)"/>
+			<column name="BIRTH_DATE" type="DATE" />
+			<column name="IS_DISABLED" type="BOOLEAN"
+				defaultValueBoolean="false" />
+			<column name="CREATE_DATE" type="TIMESTAMP" />
+			<column name="CREATE_USER" type="VARCHAR2(500 BYTE)" />
+		</createTable>
+	</changeSet>
+		<changeSet id="01.08" author="jogasingh">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="PLAYER_QA" />
+			</not>
+		</preConditions>
+		<createTable tableName="PLAYER_QA">
+			<column name="ID" type="VARCHAR2(100 BYTE)">
+				<constraints primaryKey="true" primaryKeyName="PLAYER_QA_PK" />
+			</column>
+			<column name="PLAYER_ID" type="VARCHAR2(100 BYTE)">
+				<constraints unique="true" uniqueConstraintName="PLAYER_QA_UK" 
+					foreignKeyName="PLAYER_QA_FK1" referencedTableName="PLAYER" referencedColumnNames="ID"/>
+			</column>
+			<column name="Q_CODE" type="VARCHAR2(100 BYTE)">
+				<constraints unique="true" uniqueConstraintName="PLAYER_QA_UK" 
+					foreignKeyName="PLAYER_QA_FK2" 
+					referencedTableName="REF_DATA" referencedColumnNames="CODE"/>
+			</column>
+			<column name="QA" type="VARCHAR2(100 BYTE)" />
+		</createTable>
+	</changeSet>
+	
+</databaseChangeLog>

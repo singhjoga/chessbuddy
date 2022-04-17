@@ -8,7 +8,6 @@ class AppException implements Exception {
 }
 class ClientException extends AppException {
   ClientException(String? code, String? message) : super(code, message);
-
 }
 class ServerException extends AppException {
   ErrorResponse response;

@@ -1,10 +1,15 @@
 
 import 'package:app/board/box.dart';
+import 'package:app/game/game-controller.dart';
+import 'package:app/game/game-state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class Board extends StatelessWidget {
   final int squareCount=8;
+  GameState gameState;
+  GameController controller;
+  Board(this.controller): gameState=controller.gameState;
+
   @override
   Widget build(BuildContext context) {
 
@@ -16,14 +21,9 @@ class Board extends StatelessWidget {
                 children: [
                   player1Area(sideLength),
                   const Divider(height: 4,thickness: 2),
-                  PlayArea(squareCount),
+                  PlayArea(squareCount,controller),
                   const Divider(height: 4,thickness: 2),
-                  player2Area(sideLength),
-                  SvgPicture.asset(
-                      'lib/assets/pieces/k.svg',
-                      color: Colors.red,
-                      semanticsLabel: 'A red up arrow'
-                  )
+                  player2Area(sideLength)
                 ]
             )
         );
@@ -31,25 +31,23 @@ class Board extends StatelessWidget {
   //    ),
     );
   }
-  Box player1Area(double sideLength) {
+  Container player1Area(double sideLength) {
     Position pos = Position(0, 0);
     Color color = Colors.grey;
-
-    return Box(position: pos, color: color, height: sideLength, width: sideLength*8);
+    return Container(color: color, height: sideLength, width: sideLength*8);
   }
-  Box player2Area(double sideLength) {
+  Container player2Area(double sideLength) {
     Position pos = Position(0, 0);
     Color color = Colors.grey;
-
-    return Box(position: pos, color: color, height: sideLength, width: sideLength*8);
+    return Container(color: color, height: sideLength, width: sideLength*8);
   }
 }
 
 
 class PlayArea extends StatelessWidget {
   final int squareCount;
-
-  const PlayArea(this.squareCount);
+  final GameController controller;
+  const PlayArea(this.squareCount, this.controller);
 
   Widget build(BuildContext context) {
 
@@ -60,7 +58,7 @@ class PlayArea extends StatelessWidget {
         return Column(
           children: List.generate(squareCount, (rank) => Expanded(
               child: Row(
-                children: List.generate(squareCount, (file) => createBox(rank, file, sideLength)),
+                children: List.generate(squareCount, (file) => createBox(8-rank, file+1, sideLength)),
               )
           )
           ),
@@ -72,11 +70,8 @@ class PlayArea extends StatelessWidget {
 
   Box createBox(int rank, int file, double sideLength) {
     Position pos = Position(rank, file);
-    bool isRankOdd = rank % 2 == 1;
-    bool isFileOdd = file % 2 == 1;
-    Color color = ((isRankOdd && isFileOdd) || (!isRankOdd && !isFileOdd) )? Colors.lightGreen: Colors.pink;
 
-    return Box(position: pos, color: color, height: sideLength, width: sideLength);
+    return Box(position: pos, height: sideLength, width: sideLength, controller: controller);
   }
 
 }
