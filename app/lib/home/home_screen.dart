@@ -1,16 +1,19 @@
 import 'package:app/board/board.dart';
+import 'package:app/common/exceptions/exceptions.dart';
+import 'package:app/game/game-channel.dart';
 import 'package:app/game/game-controller.dart';
 import 'package:app/game/game-state.dart';
 import 'package:flutter/material.dart';
 import 'package:app/home/left_menu.dart';
 
 class HomePage extends StatelessWidget {
-  final _intialFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+ // final _initialFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
+  final _initialFEN = 'r1b1k1r1/pppp1ppp/n3p2P/P7/7q/P4PP1/2PPP3/1NBQKBNn b q - 0 10';
   const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    GameController controller = GameController.fromFEN(_intialFEN);
+    GameController controller = GameController.fromFEN(_initialFEN);
     return Scaffold(
       drawer: const Drawer(
         child: LeftMenu(),

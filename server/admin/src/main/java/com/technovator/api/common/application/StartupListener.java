@@ -17,7 +17,7 @@ public class StartupListener{
 	private CommonAppInitializer commonInitializer;
 
 	@Inject
-	private CommonAppInitializer appInitializer;
+	private AppInitializer appInitializer;
     void onStart(@Observes StartupEvent ev) {               
 		LOG.info("Initializing application...");
 		commonInitializer.onStart();

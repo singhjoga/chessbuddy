@@ -7,7 +7,7 @@ class GameController extends ValueNotifier<GameState> {
   factory GameController.fromFEN(String fen) => GameController._(GameState(fen));
   GameController._(this.gameState): super(gameState);
 
-  makeMove(GamePiece piece, Position pos) {
+  makeMove(PieceInfo piece, Position pos) {
     if (gameState.makeMove(piece, pos)) {
       notifyListeners();
       return true;
@@ -16,7 +16,7 @@ class GameController extends ValueNotifier<GameState> {
   }
 
   makeComputerMove() async{
-    if (gameState.makeComputerMove()) {
+    if (await gameState.makeComputerMove()) {
       notifyListeners();
     }
   }

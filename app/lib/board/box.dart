@@ -1,46 +1,27 @@
-import 'dart:developer';
+import 'package:app/board/piece.dart';
 import 'package:app/game/game-controller.dart';
 import 'package:app/game/game-state.dart';
-import 'package:chess_vectors_flutter/chess_vectors_flutter.dart';
 import 'package:flutter/material.dart';
 
-final pieces = [
-  [
-    WhitePawn(),
-    WhiteKnight(),
-    WhiteBishop(),
-    WhiteRook(),
-    WhiteQueen(),
-    WhiteKing()
-  ],
-  [
-    BlackPawn(),
-    BlackKnight(),
-    BlackBishop(),
-    BlackRook(),
-    BlackQueen(),
-    BlackKing()
-  ]
-];
 
 class Box extends StatefulWidget {
   final Position position;
-  late GameController controller;
+  final GameController controller;
   final double height;
   final double width;
 
-  Box(
+  const Box(
       {required this.position,
       required this.controller,
       required this.height,
-      required this.width}) {}
+      required this.width});
 
   @override
   State<Box> createState() => BoxState();
 }
 
 class BoxState extends State<Box> {
-  GamePiece? piece;
+  PieceInfo? piece;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +32,7 @@ class BoxState extends State<Box> {
           piece = gameState.getPiece(widget.position);
           Widget? child;
           if (piece != null) {
-            child = ActivePiece(piece!, this);
+            child = ActivePiece(piece!);
           }
           var box = Container(
               height: widget.height,
@@ -67,8 +48,7 @@ class BoxState extends State<Box> {
               return box;
             },
             onAccept: (ActivePiece data) async {
-              GamePiece draggedPiece = data.piece;
-              BoxState sourceState = data.boxState;
+              PieceInfo draggedPiece = data.piece;
               bool moved =
                   widget.controller.makeMove(draggedPiece, widget.position);
               if (moved) {
@@ -89,25 +69,5 @@ class BoxState extends State<Box> {
 
   refresh() {
     setState(() {});
-  }
-}
-
-class ActivePiece extends StatelessWidget {
-  GamePiece piece;
-  BoxState boxState;
-  ActivePiece(this.piece, this.boxState);
-
-  @override
-  Widget build(BuildContext context) {
-    return Draggable<ActivePiece>(
-        data: this,
-        child: pieces[piece.color.index][piece.type.index],
-        feedback: pieces[piece.color.index][piece.type.index],
-        childWhenDragging: ColorFiltered(
-            colorFilter: const ColorFilter.mode(
-              Colors.grey,
-              BlendMode.saturation,
-            ),
-            child: pieces[piece.color.index][piece.type.index]));
   }
 }

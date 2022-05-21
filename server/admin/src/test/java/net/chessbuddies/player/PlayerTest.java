@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,8 +31,12 @@ public class PlayerTest extends CrudTest<Player, String>{
 		super.setResourceUri(url.toString());
 	}
     @Test
-    public void testAdd() throws Exception {
-    	super.testAdd();
+    public void testAddWithQuestions() throws Exception {
+    	String id = super.testAdd();
+    	String uri = getResourceUri(id)+"?returnQuestionAnswers=true";
+    	Player player = getResource(uri, Player.class);
+    	Assertions.assertEquals(3, player.getQuestionAnswers().size());
+    	
     }
     protected Player create(String username, String password, String firstName, String lastName, LocalDate birthDate) {
     	Player obj = new Player();

@@ -1,0 +1,27 @@
+transkey,langcode,value
+sex_type,en,Sex
+male,en,Male
+female,en,Female
+sex_other,en,Others
+sex_unknown,en,Not Given
+reg_questions,en,Registration Questions
+fav_color,en,Favorite Color
+fav_pet,en,Favorite Pet
+fav_food,en,Favorite Food
+mother_nickname,en,Mother’s Nickname
+father_nichname,en,Father’s Nickname
+germany,en,Germany
+germany,de,Deutschland
+india,en,India
+india,de,Indien
+sex_type,de,Geschlecht
+male,de,Männlich
+female,de,Weiblich
+sex_other,de,Andere
+sex_unknown,de,Nicht gegeben
+reg_questions,de,Fragen zur Registrierung
+fav_color,de,Lieblingsfarbe
+fav_pet,de,Lieblingstier
+fav_food,de,Lieblingsessen
+mother_nickname,de,Spitzname der Mutter
+father_nichname,de,Spitzname des Vaters

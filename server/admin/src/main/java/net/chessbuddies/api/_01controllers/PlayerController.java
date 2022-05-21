@@ -54,7 +54,7 @@ public class PlayerController extends BaseParentResourceController<Player, Strin
 	@Operation(description = "Get an existing resource by ID. Not Found error is thrown if the resource is not found")
 
 	public RestResponse<Player> getOne(@RestPath String id, @RestQuery Boolean returnQuestionAnswers) {
-		return RestResponseBuilder.ok(service.getById(id));
+		return RestResponseBuilder.ok(service.getById(id, returnQuestionAnswers));
 	}
 		
 }

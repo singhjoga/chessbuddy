@@ -1,18 +1,21 @@
 import 'dart:developer';
 
+import 'package:app/common/model/move.dart';
+import 'package:app/common/service/http-client.dart';
 import 'package:chess/chess.dart' as chess;
 import 'package:flutter/material.dart';
 class GameState{
   late chess.Chess game;
+  late HttpService http;
   bool isAgainstHumanPlayer=false;
-  PieceColor localPieceColor = PieceColor.white;
-
+  PieceColor myColor = PieceColor.black;
+  PieceColor opponentColor = PieceColor.white;
   GameState(String startFen){
-    game = chess.Chess();
-    game.update_setup(startFen);
+    game = chess.Chess.fromFEN(startFen);
+    http = HttpService();
   }
 
-  GamePiece? getPiece(Position pos) {
+  PieceInfo? getPiece(Position pos) {
     if (pos.file == 0 || pos.rank == 0) {
       return null;
     }
@@ -24,14 +27,17 @@ class GameState{
     PieceType pt = PieceType.values.elementAt(piece.type.shift);
     PieceColor color = PieceColor.values.elementAt(piece.color.index);
 
-    return GamePiece(pos, pt, color);
+    return PieceInfo(pos, pt, color);
   }
-  makeMove(GamePiece piece, Position pos) {
-    bool moved = game.move({"from": piece.pos.toBoardId(), "to": pos.toBoardId()});
+  makeMove(PieceInfo piece, Position pos) {
+    return makeMoveFromTo(piece.pos.toBoardId(), pos.toBoardId());
+  }
+  makeMoveFromTo(String from, String to) {
+    bool moved = game.move({"from": from, "to": to});
     if (moved) {
-      log('Moved: from ${piece.pos.toBoardId()} to ${pos.toBoardId()}');
+      log('Moved: from $from to $to');
     }else {
-      log('Move failed: from ${piece.pos.toBoardId()} to ${pos.toBoardId()}');
+      log('Move failed: from $from to $to');
     }
     return moved;
   }
@@ -41,19 +47,80 @@ class GameState{
     Color color = ((isRankOdd && isFileOdd) || (!isRankOdd && !isFileOdd) )? Colors.lightGreen: Colors.pink;
     return color;
   }
-  makeComputerMove(){
-    var moves = game.moves();
-    var move = moves[0];
-    return game.move(move);
+  makeComputerMove() async{
+    String fen = game.generate_fen();
+    String reversed = _flipFen(fen);
+    MoveRequest req = MoveRequest(fen);
+    log("Move request 1: $fen");
+   // log("Move request 2: $reversed");
+    Map<String, dynamic> resp = await http.post("http://10.0.2.2:8080/engine/move", req);
+    String move = resp["move"];
+    log("Move response: $move");
+    List<String> moves = move.split("-");
+    String from = moves.elementAt(0);
+    String to = moves.elementAt(1);
+    return makeMoveFromTo(from, to);
+  }
+  _flipFile(String move) {
+    String correct = 'abcdefgh';
+    String reversed = 'hgfedcba';
+    String file = move.characters.elementAt(0);
+    String rank = move.characters.elementAt(1);
+    int fileIndex = correct.indexOf(file);
+    String newFile = reversed.characters.elementAt(fileIndex);
+    return newFile+rank;
+  }
+  _flipFen(String fen) {
+    List<String> parts = fen.split(" ");
+    String reversed = parts[0].split('/').reversed.join('/');
+    parts[0]=reversed;
+    return parts.join(' ');
+  }
+  bool isInCheck(PieceColor color) {
+    return game.turn.index == color.index && game.in_check;
+  }
+  bool hasWon(PieceColor color) {
+    return game.turn.index != color.index && game.in_checkmate;
+  }
+  bool hasLost(PieceColor color) {
+    return game.turn.index == color.index && game.in_checkmate;
+  }
+  Map<PieceType, int> getCapturedPiecesByColor(PieceColor color) {
+    PieceColor capturedColor = color == PieceColor.white?PieceColor.black: PieceColor.white;
+    //by default all are captured
+    Map<PieceType, int> result = {
+      PieceType.king: 1,
+      PieceType.queen: 1,
+      PieceType.bishop: 2,
+      PieceType.rook: 2,
+      PieceType.knight: 2,
+      PieceType.pawn: 8
+    };
+    for (String file in Position.files) {
+      for (int rank=1; rank <= 8; rank++) {
+        String pos='$file$rank';
+        chess.Piece? piece = game.get(pos);
+        if (piece == null) continue;
+        PieceType pt = PieceType.values.elementAt(piece.type.shift);
+        PieceColor color = PieceColor.values.elementAt(piece.color.index);
+        if (color != capturedColor) continue;
+        int? capturedCount = result[pt];
+        if (capturedCount == null) continue;
+        capturedCount--;
+        result[pt]=capturedCount;
+      }
+    }
+
+    return result;
   }
 }
 
-class GamePiece {
+class PieceInfo {
   Position pos;
   PieceType type;
   PieceColor color;
 
-  GamePiece(this.pos, this.type, this.color);
+  PieceInfo(this.pos, this.type, this.color);
 }
 
 class Position {
@@ -61,14 +128,21 @@ class Position {
   static const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
   late int rank;
   late int file;
-
-  Position(this.rank, this.file);
-  Position.of(String boardPosition) {
+  late GameState game;
+  Position(this.rank, this.file, this.game);
+  Position.of(String boardPosition, GameState game1) {
     rank = int.parse(boardPosition.substring(1, 2));
     file = validFiles.indexOf(boardPosition.substring(0, 1)) + 1;
+    game=game1;
   }
   String toBoardId() {
-    return '${files[file - 1]}$rank';
+    if (game.myColor == PieceColor.white) {
+      return '${files[file - 1]}$rank';
+    }else{
+      int r = 9-rank;
+      return '${files[8-file]}$r';
+    }
+
   }
 }
 

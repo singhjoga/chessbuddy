@@ -14,4 +14,7 @@ public interface Constants {
 	public static final long PROPSET_ID_HOST=5;
 	String RESOURCE_ID="sm-api";
 	String OAUTH_CLIENT_ID="komrade-server";
+	String ENGLISH_LANGUAGE_CODE="en";
+	String HEADER_CONTENT_LANGUAGE = "Content-Language";
+	String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
 }

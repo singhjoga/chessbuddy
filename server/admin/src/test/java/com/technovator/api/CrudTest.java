@@ -15,12 +15,14 @@ public abstract class CrudTest<T extends AbstractResource, ID extends Serializab
 		this.simpleType = simpleType;
 		this.arrayType = arrayType;
 	}
-	protected void testAdd() throws Exception {
+	protected ID testAdd() throws Exception {
 	   	T obj = create();
         ID id = (ID)createResourceSuccess(getResourceUri(), obj);
         T[] list = getResource(getResourceUri(),arrayType);
         T saved = findByIdIn(list, id);
         assertThat(saved).isNotNull();
+        
+        return id;
 	}
 	protected abstract T create();
 	protected T findByIdIn(T[] list, ID id) {

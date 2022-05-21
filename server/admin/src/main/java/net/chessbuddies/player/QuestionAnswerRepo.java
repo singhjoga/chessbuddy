@@ -11,7 +11,6 @@ public class QuestionAnswerRepo implements ChildEntityRepository<QuestionAnswer,
 
 	@Override
 	public List<QuestionAnswer> findAll(String parentId) {
-		return list("parentId", parentId);
+		return list("playerId", parentId);
 	}
-
 }

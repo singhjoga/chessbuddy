@@ -16,7 +16,8 @@
 	            separator=","  
 	            tableName="REF_DATA">  
 	        <column  header="code" name="CODE" type="STRING"/>  
-	        <column  header="typecode" name="TYPE_CODE" type="STRING"/>  
+	        <column  header="typecode" name="TYPE_CODE" type="STRING"/>
+	        <column  header="value" name="VALUE" type="STRING"/>  
 	        <column  header="displayorder" name="DISPLAY_ORDER" type="NUMERIC"/>   
 	    </loadUpdateData> 
     </changeSet>
@@ -27,56 +28,57 @@
 	            primaryKey="code"  
 	            quotchar="'"  
 	            relativeToChangelogFile="true"    
-	            separator=";"  
+	            separator=","  
 	            tableName="LANG">  
 	        <column  header="code" name="CODE" type="STRING"/>  
-	        <column  header="engname" name="ENG_NAME" type="STRING"/>  
+	        <column  header="engname" name="EN_NAME" type="STRING"/>  
 	        <column  header="localname" name="LOCAL_NAME" type="STRING"/>  
 	      	<column  header="isdisabled" name="IS_DISABLED" type="BOOLEAN"/>  
 	    </loadUpdateData> 
     </changeSet>
+
 	<changeSet id="01.03" author="jogasingh">
-		<loadUpdateData  
-	            encoding="UTF-8"  
-	            file="ref-data-value.csv"  
-	            primaryKey="code,lang_code"  
-	            quotchar="'"  
-	            relativeToChangelogFile="true"    
-	            separator=";"  
-	            tableName="REF_DATA_VAL">  
-	        <column  header="code" name="CODE" type="STRING"/>  
-	        <column  header="langcode" name="LANG_CODE" type="STRING"/>  
-	        <column  header="value" name="VALUE" type="STRING"/>  
-	        <column  header="description" name="DESCRIPTION" type="STRING"/>  
-	    </loadUpdateData> 
-    </changeSet>
-	<changeSet id="01.04" author="jogasingh">
 		<loadUpdateData  
 	            encoding="UTF-8"  
 	            file="country.csv"  
 	            primaryKey="code"  
 	            quotchar="'"  
 	            relativeToChangelogFile="true"    
-	            separator=";"  
+	            separator=","  
 	            tableName="COUNTRY">  
 	        <column  header="code" name="CODE" type="STRING"/>  
 	        <column  header="deflangcode" name="DEF_LANG_CODE" type="STRING"/>
-	        <column  header="engname" name="ENG_NAME" type="STRING"/>
+	        <column  header="name" name="EN_NAME" type="STRING"/>
+	        <column  header="localname" name="LOCAL_NAME" type="STRING"/>
 	        <column  header="dateformat" name="DATE_FORMAT" type="STRING"/>  
+	    </loadUpdateData> 
+    </changeSet>
+    <changeSet id="01.04" author="jogasingh">
+		<loadUpdateData  
+	            encoding="UTF-8"  
+	            file="trans.csv"  
+	            primaryKey="trans_key"  
+	            quotchar="'"  
+	            relativeToChangelogFile="true"    
+	            separator=","  
+	            tableName="TRANS">  
+	        <column  header="transkey" name="TRANS_KEY" type="STRING"/>  
+	        <column  header="group" name="TRANS_GRP" type="STRING"/>  
+	        <column  header="description" name="DESCRIPTION" type="STRING"/>  
 	    </loadUpdateData> 
     </changeSet>
 	<changeSet id="01.05" author="jogasingh">
 		<loadUpdateData  
 	            encoding="UTF-8"  
-	            file="country-name.csv"  
-	            primaryKey="code"  
+	            file="trans-value.csv"  
+	            primaryKey="TRANS_KEY, LANG_CODE"  
 	            quotchar="'"  
 	            relativeToChangelogFile="true"    
-	            separator=";"  
-	            tableName="COUNTRY_NAME">  
-	        <column  header="code" name="CODE" type="STRING"/>  
+	            separator=","  
+	            tableName="TRANS_VAL">  
+	        <column  header="transkey" name="TRANS_KEY" type="STRING"/>  
 	        <column  header="langcode" name="LANG_CODE" type="STRING"/>  
-	        <column  header="localname" name="LOCAL_NAME" type="STRING"/>  
+	        <column  header="value" name="VALUE" type="STRING"/>  
 	    </loadUpdateData> 
     </changeSet>      
 </databaseChangeLog>

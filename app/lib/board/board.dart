@@ -1,7 +1,9 @@
 
 import 'package:app/board/box.dart';
+import 'package:app/board/piece.dart';
 import 'package:app/game/game-controller.dart';
 import 'package:app/game/game-state.dart';
+import 'package:blinking_text/blinking_text.dart';
 import 'package:flutter/material.dart';
 
 class Board extends StatelessWidget {
@@ -19,11 +21,11 @@ class Board extends StatelessWidget {
             padding: const EdgeInsets.all(4.0),
             child:  Column(
                 children: [
-                  player1Area(sideLength),
+                  playerArea(sideLength, gameState.opponentColor),
                   const Divider(height: 4,thickness: 2),
-                  PlayArea(squareCount,controller),
+                  GameArea(squareCount,controller),
                   const Divider(height: 4,thickness: 2),
-                  player2Area(sideLength)
+                  playerArea(sideLength, gameState.myColor)
                 ]
             )
         );
@@ -31,23 +33,86 @@ class Board extends StatelessWidget {
   //    ),
     );
   }
-  Container player1Area(double sideLength) {
-    Position pos = Position(0, 0);
+  Container playerArea(double sideLength, PieceColor player) {
+    Position pos = Position(0, 0, gameState);
     Color color = Colors.grey;
-    return Container(color: color, height: sideLength, width: sideLength*8);
-  }
-  Container player2Area(double sideLength) {
-    Position pos = Position(0, 0);
-    Color color = Colors.grey;
-    return Container(color: color, height: sideLength, width: sideLength*8);
+    return Container(color: color, height: sideLength, width: sideLength*8,
+    child: PlayerArea(controller, gameState, player));
   }
 }
+class PlayerArea extends StatefulWidget {
+  final GameState gameState;
+  final PieceColor player;
+  final GameController controller;
+  PlayerArea(this.controller, this.gameState, this.player);
 
+  @override
+  State<PlayerArea> createState() => PlayerState();
+}
+class PlayerState extends State<PlayerArea> {
 
-class PlayArea extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<GameState>(
+        valueListenable: widget.controller,
+        builder: (context, gameState, _) {
+
+          return Row(
+              children: [
+                if (widget.gameState.isInCheck(widget.player) && !widget.gameState.hasLost(widget.player)) const BlinkText(
+                  'Check!',
+                  style: TextStyle(fontSize: 36.0, color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+                if (widget.gameState.hasWon(widget.player)) const BlinkText(
+                  'Won!',
+                  style: TextStyle(fontSize: 36.0, color: Colors.green, fontWeight: FontWeight.bold)
+                ),
+                Row(
+                  children: getCapturedPieces(),
+                )
+              ]
+          );
+        });
+  }
+  List<Widget> getCapturedPieces() {
+    Map<PieceType, int> capturedPieces = widget.gameState.getCapturedPiecesByColor(widget.player);
+    List<Widget> result = [];
+    capturedPieces.forEach((pieceType, count) {
+      if (count > 0 ) {
+        PieceColor capturedColor = widget.player == PieceColor.white?PieceColor.black: PieceColor.white;
+        Position pos = Position(0, 0, widget.gameState);
+        PieceInfo pieceInfo = PieceInfo(pos,pieceType,capturedColor);
+        VisualPiece vp =  VisualPiece(pieceInfo);
+        Container container = Container(
+          child: Stack(
+            children: [
+              vp,
+              if (count > 1)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.red),
+                    alignment: Alignment.center,
+                    child: Text('$count'),
+                  ),
+                )
+            ],
+          ),
+        );
+        result.add(container);
+      }
+    });
+
+    return result;
+  }
+}
+class GameArea extends StatelessWidget {
   final int squareCount;
   final GameController controller;
-  const PlayArea(this.squareCount, this.controller);
+  const GameArea(this.squareCount, this.controller);
 
   Widget build(BuildContext context) {
 
@@ -69,7 +134,7 @@ class PlayArea extends StatelessWidget {
   }
 
   Box createBox(int rank, int file, double sideLength) {
-    Position pos = Position(rank, file);
+    Position pos = Position(rank, file, controller.gameState);
 
     return Box(position: pos, height: sideLength, width: sideLength, controller: controller);
   }

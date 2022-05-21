@@ -1,2 +1,2 @@
-code;deflangcode;engname;dateformat
-de;en;Germany;dd.mm.yy
+code,deflangcode,name,localname,dateformat
+de,en,Germany,${germany},dd.mm.yy
