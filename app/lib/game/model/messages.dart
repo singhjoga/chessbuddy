@@ -2,17 +2,23 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-class CodedData {
+abstract class MessagePayload {
+  toJson();
+  Map<String, dynamic> toMap(Map<String, dynamic> json);
+}
+class InfoData extends MessagePayload{
   String code;
   String message;
 
-  CodedData(this.code, this.message);
-  factory CodedData.fromJson(Map<String, dynamic> json) {
-    return CodedData(json['code'], json['message']);
+  InfoData(this.code, this.message);
+  factory InfoData.fromJson(Map<String, dynamic> json) {
+    return InfoData(json['code'], json['message']);
   }
+  @override
   toJson() {
     return toMap({});
   }
+  @override
   Map<String, dynamic> toMap(Map<String, dynamic> json) {
     json['code']= code;
     json['message']= message;
@@ -21,7 +27,7 @@ class CodedData {
   }
 }
 
-class GameInitiateData {
+class GameInitiateData extends MessagePayload{
   String? buddy;
   bool waitForBuddy;
   GameInitiateData([this.buddy, this.waitForBuddy=false]);
@@ -29,9 +35,11 @@ class GameInitiateData {
   factory GameInitiateData.fromJson(Map<String, dynamic> json) {
     return GameInitiateData(json['buddy'], json['waitForBuddy']);
   }
+  @override
   toJson() {
     return toMap({});
   }
+  @override
   Map<String, dynamic> toMap(Map<String, dynamic> json) {
     json['buddy']= buddy;
     json['waitForBuddy']= waitForBuddy;
@@ -39,7 +47,7 @@ class GameInitiateData {
   }
 }
 
-class GameStartData {
+class GameStartData extends MessagePayload{
   String firstMove;
 
   GameStartData(this.firstMove);
@@ -48,16 +56,69 @@ class GameStartData {
     return GameStartData(json['firstMove']);
   }
 
+  @override
   toJson() {
     return toMap({});
   }
+  @override
   Map<String, dynamic> toMap(Map<String, dynamic> json) {
     json['firstMove']= firstMove;
     return json;
   }
 }
 
-abstract class Message<T> {
+class Message {
+  static const int messageTypeError=11;
+  static const int messageTypeInfo=0;
+  static const int messageTypeGameInitiate=1;
+  static const int messageTypeGameStart=2;
+  static const int messageTypeGameMoveRequest=3;
+  static const int messageTypeGameMoveResponse=4;
+  int type;
+  MessagePayload payload;
+  Message(this.type, this.payload);
+
+  factory Message.fromJson(Map<String, dynamic> json) {
+    int type = json['type'];
+    Map<String, dynamic> payloadJson = json['payload'];
+    MessagePayload payload;
+    switch (type) {
+      case Message.messageTypeError:
+      case Message.messageTypeInfo:
+        payload = InfoData.fromJson(payloadJson);
+        break;
+      case Message.messageTypeGameInitiate:
+        payload = GameInitiateData.fromJson(payloadJson);
+        break;
+      case Message.messageTypeGameStart:
+        payload = GameStartData.fromJson(payloadJson);
+        break;
+      default:
+        payload = InfoData.fromJson(payloadJson);
+    }
+    return Message(type, payload);
+  }
+  toJson() {
+    return toMap({});
+  }
+  Map<String, dynamic> toMap(Map<String, dynamic> json) {
+    json['type']= type;
+    json['payload']= payload.toJson();
+    return json;
+  }
+  bool isInfoMessage() {
+    return type == messageTypeInfo;
+  }
+  bool isErrorMessage() {
+    return type == messageTypeError;
+  }
+
+  static Message parse(String jsonStr) {
+    Map<String, dynamic> json = jsonDecode(jsonStr);
+    return Message.fromJson(json);
+  }
+}
+abstract class MessageOld<T> {
   static const int messageTypeError=11;
   static const int messageTypeInfo=0;
   static const int messageTypeGameInitiate=1;
@@ -66,7 +127,7 @@ abstract class Message<T> {
   static const int messageTypeGameMoveResponse=4;
   int type;
 
-  Message(this.type);
+  MessageOld(this.type);
 
   T getData();
 
@@ -80,12 +141,12 @@ abstract class Message<T> {
   }
 }
 
-class ErrorMessage extends Message<CodedData>{
-  CodedData data;
-  ErrorMessage(String code, String message): data =CodedData(code, message), super(Message.messageTypeError);
+class ErrorMessage extends MessageOld<InfoData>{
+  InfoData data;
+  ErrorMessage(String code, String message): data =InfoData(code, message), super(Message.messageTypeError);
 
   @override
-  CodedData getData() {
+  InfoData getData() {
     return data;
   }
   @override
@@ -104,13 +165,13 @@ class ErrorMessage extends Message<CodedData>{
   }
 }
 
-class InfoMessage extends Message<CodedData>{
-  CodedData data;
+class InfoMessage extends MessageOld<InfoData>{
+  InfoData data;
 
-  InfoMessage(String code, String message): data =CodedData(code, message), super(Message.messageTypeInfo);
+  InfoMessage(String code, String message): data =InfoData(code, message), super(Message.messageTypeInfo);
 
   @override
-  CodedData getData() {
+  InfoData getData() {
     return data;
   }
   factory InfoMessage.fromJson(Map<String, dynamic> json) {
@@ -126,18 +187,5 @@ class InfoMessage extends Message<CodedData>{
     super.toMap(json);
     json['data']= data.toMap(json);
     return json;
-  }
-}
-
-class MessageParser {
-  static Message parse(String jsonStr) {
-    Map<String, dynamic> json = jsonDecode(jsonStr);
-    int type = json['type'];
-    switch (type) {
-      case Message.messageTypeError:
-        return ErrorMessage.fromJson(json);
-      default:
-        return InfoMessage.fromJson(json);
-    }
   }
 }
