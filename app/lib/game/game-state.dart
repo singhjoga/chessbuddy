@@ -8,8 +8,8 @@ class GameState{
   late chess.Chess game;
   late HttpService http;
   bool isAgainstHumanPlayer=false;
-  PieceColor myColor = PieceColor.black;
-  PieceColor opponentColor = PieceColor.white;
+  PieceColor myColor = PieceColor.white;
+  PieceColor opponentColor = PieceColor.black;
   GameState(String startFen){
     game = chess.Chess.fromFEN(startFen);
     http = HttpService();

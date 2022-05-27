@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 abstract class MessagePayload {
   toJson();
   Map<String, dynamic> toMap(Map<String, dynamic> json);
@@ -47,13 +45,15 @@ class GameInitiateData extends MessagePayload{
   }
 }
 
-class GameStartData extends MessagePayload{
-  String firstMove;
 
-  GameStartData(this.firstMove);
+class CommandData extends MessagePayload{
+  int command;
+  Map<String, dynamic>? data;
 
-  factory GameStartData.fromJson(Map<String, dynamic> json) {
-    return GameStartData(json['firstMove']);
+  CommandData(this.command, this.data);
+
+  factory CommandData.fromJson(Map<String, dynamic> json) {
+    return CommandData(json['command'], json['data']);
   }
 
   @override
@@ -62,42 +62,25 @@ class GameStartData extends MessagePayload{
   }
   @override
   Map<String, dynamic> toMap(Map<String, dynamic> json) {
-    json['firstMove']= firstMove;
+    json['command']= command;
+    json['data']= data;
     return json;
   }
 }
 
-class Message {
+abstract class Message<T extends MessagePayload> {
   static const int messageTypeError=11;
   static const int messageTypeInfo=0;
   static const int messageTypeGameInitiate=1;
-  static const int messageTypeGameStart=2;
-  static const int messageTypeGameMoveRequest=3;
-  static const int messageTypeGameMoveResponse=4;
+  static const int messageTypeCommand=2;
+  static const int messageTypeCommandResponse=3;
+  static const int messageTypeGameMoveRequest=4;
+  static const int messageTypeGameMoveResponse=5;
+
   int type;
-  MessagePayload payload;
+  T payload;
   Message(this.type, this.payload);
 
-  factory Message.fromJson(Map<String, dynamic> json) {
-    int type = json['type'];
-    Map<String, dynamic> payloadJson = json['payload'];
-    MessagePayload payload;
-    switch (type) {
-      case Message.messageTypeError:
-      case Message.messageTypeInfo:
-        payload = InfoData.fromJson(payloadJson);
-        break;
-      case Message.messageTypeGameInitiate:
-        payload = GameInitiateData.fromJson(payloadJson);
-        break;
-      case Message.messageTypeGameStart:
-        payload = GameStartData.fromJson(payloadJson);
-        break;
-      default:
-        payload = InfoData.fromJson(payloadJson);
-    }
-    return Message(type, payload);
-  }
   toJson() {
     return toMap({});
   }
@@ -112,80 +95,64 @@ class Message {
   bool isErrorMessage() {
     return type == messageTypeError;
   }
-
-  static Message parse(String jsonStr) {
-    Map<String, dynamic> json = jsonDecode(jsonStr);
-    return Message.fromJson(json);
-  }
-}
-abstract class MessageOld<T> {
-  static const int messageTypeError=11;
-  static const int messageTypeInfo=0;
-  static const int messageTypeGameInitiate=1;
-  static const int messageTypeGameStart=2;
-  static const int messageTypeGameMoveRequest=3;
-  static const int messageTypeGameMoveResponse=4;
-  int type;
-
-  MessageOld(this.type);
-
-  T getData();
-
-  fromJson(Map<String, dynamic> json) {
-    type = json['type'];
-  }
-
-  Map<String, dynamic> toMap(Map<String, dynamic> json) {
-    json['type']= type;
-    return json;
-  }
 }
 
-class ErrorMessage extends MessageOld<InfoData>{
-  InfoData data;
-  ErrorMessage(String code, String message): data =InfoData(code, message), super(Message.messageTypeError);
+class ErrorMessage extends Message<InfoData>{
+  ErrorMessage(String code, String message): super(Message.messageTypeError, InfoData(code, message));
 
-  @override
-  InfoData getData() {
-    return data;
-  }
   @override
   factory ErrorMessage.fromJson(Map<String, dynamic> json) {
-    Map<String, dynamic> dataJson = json['data'];
-    return ErrorMessage(dataJson['code'],dataJson['message']);
-  }
-  toJson() {
-    return toMap({});
-  }
-  @override
-  Map<String, dynamic> toMap(Map<String, dynamic> json) {
-    super.toMap(json);
-    json['data']= data.toMap(json);
-    return json;
+    return ErrorMessage(json['code'],json['message']);
   }
 }
 
-class InfoMessage extends MessageOld<InfoData>{
-  InfoData data;
+class InfoMessage extends Message<InfoData>{
+  InfoMessage(String code, String message): super(Message.messageTypeInfo, InfoData(code, message));
 
-  InfoMessage(String code, String message): data =InfoData(code, message), super(Message.messageTypeInfo);
-
-  @override
-  InfoData getData() {
-    return data;
-  }
   factory InfoMessage.fromJson(Map<String, dynamic> json) {
-    Map<String, dynamic> dataJson = json['data'];
-    return InfoMessage(dataJson['code'],dataJson['message']);
+    return InfoMessage(json['code'],json['message']);
   }
+}
 
-  toJson() {
-    return toMap({});
+class GameInitiateMessage extends Message<GameInitiateData>{
+  GameInitiateMessage(String? buddy, bool waitForBuddy): super(Message.messageTypeGameInitiate, GameInitiateData(buddy, waitForBuddy));
+
+  factory GameInitiateMessage.fromJson(Map<String, dynamic> json) {
+    return GameInitiateMessage(json['buddy'],json['waitForBuddy']);
   }
-  @override
-  Map<String, dynamic> toMap(Map<String, dynamic> json) {
-    super.toMap(json);
-    json['data']= data.toMap(json);
-    return json;
+}
+class CommandResponseMessage extends Message<CommandData>{
+  CommandResponseMessage(Map<String, dynamic> json): super(Message.messageTypeCommandResponse, CommandData.fromJson(json));
+
+  factory CommandResponseMessage.fromJson(Map<String, dynamic> json) {
+    return CommandResponseMessage(json);
+  }
+}
+class CommandMessage extends Message<CommandData>{
+  static const int commandPlayFirstAsk=1;
+  static const int commandPlayFirstConfirm=2;
+  CommandMessage(Map<String, dynamic> json): super(Message.messageTypeCommand, CommandData.fromJson(json));
+
+  factory CommandMessage.fromJson(Map<String, dynamic> json) {
+    return CommandMessage(json);
+  }
+}
+class MessageParser {
+  static Message parse(String jsonStr) {
+    Map<String, dynamic> json = jsonDecode(jsonStr);
+    int type = json['type'];
+    Map<String, dynamic> payload = json['payload'];
+    switch (type) {
+      case Message.messageTypeError:
+        return ErrorMessage.fromJson(payload);
+      case Message.messageTypeInfo:
+        return InfoMessage.fromJson(payload);
+      case Message.messageTypeGameInitiate:
+        return GameInitiateMessage.fromJson(payload);
+      case Message.messageTypeCommand:
+        return CommandMessage.fromJson(payload);
+      default:
+        return InfoMessage.fromJson(payload);
+    }
   }
 }

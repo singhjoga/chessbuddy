@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/common/exceptions/exceptions.dart';
-import 'package:app/game/model/messages2.dart';
+import 'package:app/game/model/messages.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -32,6 +32,14 @@ class GameChannel {
       return data;
     }
     return "";
+  }
+  sendReply(CommandMessage cmdMsg, Map<String, String> data) {
+    sendCommandResponse(cmdMsg.payload.command, data);
+  }
+  sendCommandResponse(int command, Map<String, String> data) {
+    Map<String, dynamic> cmdData = {'command':command, 'data': data};
+    CommandResponseMessage respMsg = CommandResponseMessage(cmdData);
+    send(respMsg);
   }
   send(Message msg){
     String json = jsonEncode(msg.toJson());
@@ -87,7 +95,7 @@ class GameChannel {
       String data = await stream.first;
       return data;
     } on TimeoutException catch (e) {
-      throw ClientException('code', e.message);
+      throw ClientException('code', '$playerName: ${e.message}');
     }
   }
   Future<String> getNext() {

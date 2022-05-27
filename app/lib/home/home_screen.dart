@@ -8,7 +8,7 @@ import 'package:app/home/left_menu.dart';
 
 class HomePage extends StatelessWidget {
  // final _initialFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
-  final _initialFEN = 'r1b1k1r1/pppp1ppp/n3p2P/P7/7q/P4PP1/2PPP3/1NBQKBNn b q - 0 10';
+  final _initialFEN = 'r1b1k1r1/pppp1ppp/n3p2P/P7/7q/P5P1/2PPPP2/1NBQKBNn w q - 0 10';
   const HomePage({Key? key}) : super(key: key);
 
   @override
