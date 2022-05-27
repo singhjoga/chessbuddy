@@ -1,0 +1,13 @@
+transkey,group,description
+sex_type,ref_data,Sex
+male,ref_data,Male
+female,ref_data,Female
+sex_other,ref_data,Others
+sex_unknown,ref_data,Not Given
+reg_questions,ref_data,Registration Questions
+fav_color,ref_data,Favorite Color
+fav_pet,ref_data,Favorite Pet
+fav_food,ref_data,Favorite Food
+mother_nickname,ref_data,Mother’s Nickname
+father_nichname,ref_data,Father’s Nickname
+germany,country_name,Germany name in different languages
