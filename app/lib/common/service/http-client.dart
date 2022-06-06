@@ -11,13 +11,20 @@ import 'package:http/testing.dart';
 class HttpService {
   late http.BaseClient client;
   CommonConfig config = CommonConfig.getInstance();
-  HttpService() {
+
+  static final HttpService _singleton = HttpService._internal();
+
+  factory HttpService() {
+    return _singleton;
+  }
+  HttpService._internal() {
     if (config.isTesting) {
       client=MockClient(config.mockHandler);
     }else{
       client = HttpClient();
     }
   }
+
   Future<Map<String, dynamic>> get(String url) async {
     return _call(Method.get, url, null);
   }
