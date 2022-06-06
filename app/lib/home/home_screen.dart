@@ -1,34 +1,62 @@
-import 'package:app/board/board.dart';
-import 'package:app/common/exceptions/exceptions.dart';
-import 'package:app/game/game-channel.dart';
-import 'package:app/game/game-controller.dart';
-import 'package:app/game/game-state.dart';
+import 'package:app/home/login.dart';
 import 'package:flutter/material.dart';
-import 'package:app/home/left_menu.dart';
 
-class HomePage extends StatelessWidget {
- // final _initialFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1';
-  final _initialFEN = 'r1b1k1r1/pppp1ppp/n3p2P/P7/7q/P5P1/2PPPP2/1NBQKBNn w q - 0 10';
-  const HomePage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+class _HomeState extends State<HomePage> {
+  bool loggedIn=false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: const Text('Chess Buddies'),
+          backgroundColor: Colors.teal),
+      body: _MainMenu(),
+    );
+  }
+}
+
+class _MainMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          MainButton("Login", () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginForm()),
+            );
+          }),
+          MainButton("Play with Buddy", () {
+
+          })
+        ],
+      )
+    );
+  }
+
+}
+
+class MainButton  extends StatelessWidget{
+  String text;
+  VoidCallback onPressed;
+
+  MainButton(this.text, this.onPressed);
 
   @override
   Widget build(BuildContext context) {
-    GameController controller = GameController.fromFEN(_initialFEN);
-    return Scaffold(
-      drawer: const Drawer(
-        child: LeftMenu(),
+    return ElevatedButton(
+      style: TextButton.styleFrom(
+        textStyle: const TextStyle(fontSize: 20),
       ),
-      appBar: AppBar(
-        leading: Builder(builder: (context) => // Ensure Scaffold is in context
-          IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer()
-         ),
-        ),
-        title: const Text('Chess Buddies'),
-        actions: const [Icon(Icons.supervised_user_circle), Icon(Icons.more_vert)],
-      ),
-      body: Board(controller),
+      onPressed: onPressed,
+      child: Text(text),
     );
   }
+
 }

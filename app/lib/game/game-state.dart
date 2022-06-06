@@ -8,11 +8,13 @@ class GameState{
   late chess.Chess game;
   late HttpService http;
   bool isAgainstHumanPlayer=false;
-  PieceColor myColor = PieceColor.white;
-  PieceColor opponentColor = PieceColor.black;
-  GameState(String startFen){
+  late PieceColor myColor;
+  late PieceColor opponentColor;
+  GameState(String startFen, [String color="white"]){
     game = chess.Chess.fromFEN(startFen);
     http = HttpService();
+    myColor = PieceColor.white.name == color?PieceColor.white:PieceColor.black;
+    opponentColor = PieceColor.white.name != color?PieceColor.white:PieceColor.black;
   }
 
   PieceInfo? getPiece(Position pos) {
@@ -29,10 +31,16 @@ class GameState{
 
     return PieceInfo(pos, pt, color);
   }
-  makeMove(PieceInfo piece, Position pos) {
+  bool makeMove(PieceInfo piece, Position pos) {
     return makeMoveFromTo(piece.pos.toBoardId(), pos.toBoardId());
   }
-  makeMoveFromTo(String from, String to) {
+  bool makeMoveFromMoveString(String moveStr) {
+    List<String> moves = moveStr.split("-");
+    String from = moves.elementAt(0);
+    String to = moves.elementAt(1);
+    return makeMoveFromTo(from, to);
+  }
+  bool makeMoveFromTo(String from, String to) {
     bool moved = game.move({"from": from, "to": to});
     if (moved) {
       log('Moved: from $from to $to');
@@ -56,10 +64,7 @@ class GameState{
     Map<String, dynamic> resp = await http.post("http://10.0.2.2:8080/engine/move", req);
     String move = resp["move"];
     log("Move response: $move");
-    List<String> moves = move.split("-");
-    String from = moves.elementAt(0);
-    String to = moves.elementAt(1);
-    return makeMoveFromTo(from, to);
+    return makeMoveFromMoveString(move);
   }
   _flipFile(String move) {
     String correct = 'abcdefgh';
@@ -78,6 +83,12 @@ class GameState{
   }
   bool isInCheck(PieceColor color) {
     return game.turn.index == color.index && game.in_check;
+  }
+  bool hasWonMe() {
+    return hasWon(myColor);
+  }
+  bool hasLostMe() {
+    return hasLost(myColor);
   }
   bool hasWon(PieceColor color) {
     return game.turn.index != color.index && game.in_checkmate;

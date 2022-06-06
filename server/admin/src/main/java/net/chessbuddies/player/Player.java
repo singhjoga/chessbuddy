@@ -26,7 +26,9 @@ public class Player extends AbstractResource<String> implements AuditableMain<St
 	@Column(name="EMAIL")
 	private String email;
 	@Column(name="LANG_CODE")
-	private String langCode;
+	private String languageCode;
+	@Column(name="SEX_TYPE_CODE")
+	private String sexTypeCode;
 	@Column(name="BIRTH_DATE")
 	@JsonFormat(pattern = Constants.JSON_DATE_FORMAT)
 //	@JsonbDateFormat(value = Constants.JSON_DATE_FORMAT)
@@ -67,12 +69,20 @@ public class Player extends AbstractResource<String> implements AuditableMain<St
 		this.email = email;
 	}
 
-	public String getLangCode() {
-		return langCode;
+	public String getLanguageCode() {
+		return languageCode;
 	}
 
-	public void setLangCode(String langCode) {
-		this.langCode = langCode;
+	public void setLanguageCode(String languageCode) {
+		this.languageCode = languageCode;
+	}
+
+	public String getSexTypeCode() {
+		return sexTypeCode;
+	}
+
+	public void setSexTypeCode(String sexTypeCode) {
+		this.sexTypeCode = sexTypeCode;
 	}
 
 	public LocalDate getBirthDate() {

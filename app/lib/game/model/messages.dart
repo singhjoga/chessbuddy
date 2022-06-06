@@ -74,7 +74,7 @@ abstract class Message<T extends MessagePayload> {
   static const int messageTypeGameInitiate=1;
   static const int messageTypeCommand=2;
   static const int messageTypeCommandResponse=3;
-  static const int messageTypeGameMoveRequest=4;
+  static const int messageTypeGameMove=4;
   static const int messageTypeGameMoveResponse=5;
 
   int type;
@@ -131,6 +131,8 @@ class CommandResponseMessage extends Message<CommandData>{
 class CommandMessage extends Message<CommandData>{
   static const int commandPlayFirstAsk=1;
   static const int commandPlayFirstConfirm=2;
+  static const int commandPlayStart=3;
+  static const int commandMakeMove=4;
   CommandMessage(Map<String, dynamic> json): super(Message.messageTypeCommand, CommandData.fromJson(json));
 
   factory CommandMessage.fromJson(Map<String, dynamic> json) {

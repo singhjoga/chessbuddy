@@ -140,12 +140,13 @@
 			</column>
 			<column name="USERNAME" type="VARCHAR2(50 BYTE)" />
 			<column name="PASSWD" type="VARCHAR2(500 BYTE)" />
+			<column name="SEX_TYPE_CODE" type="VARCHAR2(20 BYTE)" />
 			<column name="FIRST_NAME" type="VARCHAR2(500 BYTE)" />
 			<column name="LAST_NAME" type="VARCHAR2(500 BYTE)" />
 			<column name="EMAIL" type="VARCHAR2(500 BYTE)">
 				<constraints unique="true" uniqueConstraintName="CUST_EMAIL_UK" />
 			</column>
-			<column name="LANG_CODE" type="VARCHAR2(100 BYTE)" />
+			<column name="LANG_CODE" type="VARCHAR2(20 BYTE)" />
 			<column name="BIRTH_DATE" type="DATE" />
 			<column name="IS_DISABLED" type="BOOLEAN" defaultValueBoolean="false" />
 			<column name="CREATE_DATE" type="TIMESTAMP" />

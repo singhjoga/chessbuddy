@@ -1,19 +1,20 @@
 import 'dart:ffi';
 
-abstract class BaseEntity {
-  String? id;
+import 'package:app/common/model/identifiable.dart';
+
+abstract class BaseEntity extends Identifiable {
   String? createUser;
   DateTime? createDate;
   Bool? isDisabled;
-  fromJson(Map<String, dynamic> data) {
-    id = data['id'];
-    createUser = data['createUser'];
-    createDate = data['createDate'];
-    isDisabled = data['isDisabled'];
-  }
 
+  BaseEntity(Map<String, dynamic> json): super(json['id']) {
+    createUser = json['createUser'];
+    createDate = json['createDate'];
+    isDisabled = json['isDisabled'];
+  }
+  @override
   toMap(Map<String, dynamic> json) {
-    json['id']= id;
+    super.toMap(json);
     json['createUser']= createUser;
     json['createDate']= createDate;
     json['isDisabled']= isDisabled;

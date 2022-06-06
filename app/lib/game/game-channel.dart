@@ -12,6 +12,7 @@ class GameChannel {
   late StreamController channel;
   String endpointUrl;
   String playerName;
+  String? _lastMessage;
 
   GameChannel(this.endpointUrl, this.playerName);
   connect() async{
@@ -20,18 +21,29 @@ class GameChannel {
       debugPrint('Connecting to: $url');
       _wsChannel = WebSocketChannel.connect(Uri.parse(url));
       channel = StreamController.broadcast();
-      channel.addStream(_wsChannel!.stream);
+      listen();
+     // channel.addStream(_wsChannel!.stream);
       await waitForOK();
     }on WebSocketChannelException catch (e) {
       throw ClientException('', 'Socket exception: ${e.message}');
     }
   }
-  Future<String> listen() async{
-    await for (final data in channel.stream) {
+  listen(){
+    _wsChannel!.stream.listen((data) {
+      channel.add(data);
+      debugPrint('$playerName received: $data');
+      _lastMessage=data;
+    });
+
+ /*   await for (final data in channel.stream) {
       debugPrint('$playerName received: $data');
       return data;
     }
     return "";
+    */
+  }
+  close() {
+    _wsChannel!.sink.close();
   }
   sendReply(CommandMessage cmdMsg, Map<String, String> data) {
     sendCommandResponse(cmdMsg.payload.command, data);
@@ -39,6 +51,11 @@ class GameChannel {
   sendCommandResponse(int command, Map<String, String> data) {
     Map<String, dynamic> cmdData = {'command':command, 'data': data};
     CommandResponseMessage respMsg = CommandResponseMessage(cmdData);
+    send(respMsg);
+  }
+  sendCommand(int command, Map<String, String> data) {
+    Map<String, dynamic> cmdData = {'command':command, 'data': data};
+    CommandMessage respMsg = CommandMessage(cmdData);
     send(respMsg);
   }
   send(Message msg){
@@ -54,7 +71,7 @@ class GameChannel {
   Future<CommandMessage> waitForCommand(int? command) async {
     CommandMessage msg = await waitForMessageType(Message.messageTypeCommand) as CommandMessage;
     if (command != null && msg.payload.command != command) {
-      throw ClientException('', 'Invalid InfoMessage received. Expected command: $command, Actual command: ${msg.payload.command}');
+      throw ClientException('', '$playerName Invalid InfoMessage received. Expected command: $command, Actual command: ${msg.payload.command}');
     }
 
     return msg;
@@ -62,7 +79,7 @@ class GameChannel {
   Future<InfoMessage> waitForInfoMessage(String? code) async {
     InfoMessage msg = await waitForMessageType(Message.messageTypeInfo) as InfoMessage;
     if (code != null && msg.payload.code != code) {
-      throw ClientException('', 'Invalid InfoMessage received. Expected code: $code, Actual code: ${msg.payload.code}');
+      throw ClientException('', '$playerName Invalid InfoMessage received. Expected code: $code, Actual code: ${msg.payload.code}');
     }
 
     return msg;
@@ -70,7 +87,7 @@ class GameChannel {
   Future<ErrorMessage> waitForErrorMessage(String? code) async {
     ErrorMessage msg = await waitForMessageType(Message.messageTypeError) as ErrorMessage;
     if (code != null && msg.payload.code != code) {
-      throw ClientException('', 'Invalid InfoMessage received. Expected code: $code, Actual code: ${msg.payload.code}');
+      throw ClientException('', '$playerName Invalid InfoMessage received. Expected code: $code, Actual code: ${msg.payload.code}');
     }
 
     return msg;
@@ -79,7 +96,7 @@ class GameChannel {
     Message msg = await waitForMessage();
     if (msg.type != type) {
       debugPrint(msg.toJson().toString());
-      throw ClientException('', 'Invalid message received. Expected type: $type, Actual type: ${msg.type}');
+      throw ClientException('', '$playerName Invalid message received. Expected type: $type, Actual type: ${msg.type}');
     }
     return msg;
   }
@@ -90,12 +107,18 @@ class GameChannel {
     return resp;
   }
   Future<String> waitForData(int timeoutMs) async {
-    final stream = channel.stream.timeout(Duration(milliseconds: timeoutMs));
     try {
+      if (_lastMessage != null) {
+        // message received when the channel was not listened
+        return _lastMessage!;
+      }
+      final stream = channel.stream.timeout(Duration(milliseconds: timeoutMs));
       String data = await stream.first;
       return data;
     } on TimeoutException catch (e) {
       throw ClientException('code', '$playerName: ${e.message}');
+    } finally {
+      _lastMessage=null;
     }
   }
   Future<String> getNext() {

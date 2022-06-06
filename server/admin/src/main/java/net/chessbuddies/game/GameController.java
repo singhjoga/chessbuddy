@@ -18,6 +18,7 @@ import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import net.chessbuddies.game.message.CommandData;
 import net.chessbuddies.game.message.CommandMessage;
 import net.chessbuddies.game.message.CommandResponseMessage;
 import net.chessbuddies.game.message.ErrorMessage;
@@ -54,7 +55,7 @@ public class GameController {
 			userInfo.setSession(session);
 		}
 		sessions.put(username, userInfo);
-		sendInfoMessage(session, "OK", "OK");
+		sendOK(session, username);
 	}
 
 	@OnClose
@@ -80,56 +81,88 @@ public class GameController {
 		UserInfo userInfo = sessions.get(username);
 		Session session = userInfo.getSession();
 		Message<?> msgObj = MessageParser.parse(message);
-		sendOK(session);
+		sendOK(session, username);
 		if (msgObj instanceof GameInitiateMessage) {
 			onInitiateGame(username, (GameInitiateMessage) msgObj);
 		} else if (msgObj instanceof CommandResponseMessage) {
 			handleCommandResponse(username, (CommandResponseMessage) msgObj);
+		} else if (msgObj instanceof CommandMessage) {
+			handleCommand(username, (CommandMessage) msgObj);
 		} else {
 
 		}
 	}
 
-	private void handleCommandResponse(String username, CommandResponseMessage cmdResponse) {
-		UserInfo userInfo = sessions.get(username);
-	
-		int cmd = cmdResponse.getPayload().getCommand();
-		if (cmd == CommandMessage.COMMAND_PLAY_FIRST_ASK) {
-			//it is a reply to the prompt for play first question. Get it confirmed from the other player.
-			sendCommand(userInfo.getBuddy(), new CommandMessage(CommandMessage.COMMAND_PLAY_FIRST_CONFIRM, cmdResponse.getPayload().getData()));
-		}else if (cmd == CommandMessage.COMMAND_PLAY_FIRST_CONFIRM) {
-			//get the response from data
-			String resp = cmdResponse.getPayload().getData().get("response");
-			//get the command which was sent
-			CommandMessage sentMsg = userInfo.getGameInfo().getLastMessage().getMessage();
-			String playFirst = sentMsg.getPayload().getData().get("playFirst");
-			if (!playFirst.equals(username) && !playFirst.equals(userInfo.getBuddy())) {
-				//value should be a username
-				throw new IllegalStateException("playFirst element value must be a player name");
-			}
-			if (resp.equals("reject")) {
-				//send new proposal to buddy
-				playFirst = playFirst.equals(username)?userInfo.getBuddy():username;
-				sentMsg.getPayload().getData().put("playFirst", playFirst);
-				sendCommand(userInfo.getBuddy(), sentMsg);
-			}else {
-				//start game
-				GameInfo gameInfo = userInfo.getGameInfo();
-				//playing first is white and other is black
-				String blackPayer = playFirst.equals(username)?userInfo.getBuddy():username;
-				gameInfo.setWhitePlayer(playFirst);
-				gameInfo.setBlackPlayer(blackPayer);
-				Map<String, String> cmdData = new HashMap<>();
-				cmdData.put("initialFeb", TEST_INTIAL_FEN);
-				CommandMessage cmdMsg = new CommandMessage(CommandMessage.COMMAND_PLAY_START, cmdData);
-				// send start msg to both
-				sendCommand(userInfo.getBuddy(), cmdMsg);
-				sendCommand(username, cmdMsg);
-			}
-		}
+	private void handleCommand(String username, CommandMessage cmdMsg) {
+		CommandData payload = cmdMsg.getPayload();
+		handleCommand(username, payload);
 	}
 
-	private void sendOK(Session session) {
+	private void handleCommandResponse(String username, CommandResponseMessage cmdResponse) {
+		CommandData payload = cmdResponse.getPayload();
+		handleCommand(username, payload);
+	}
+
+	private void handleCommand(String username, CommandData cmdData) {
+		UserInfo userInfo = sessions.get(username);
+
+		int cmd = cmdData.getCommand();
+		if (cmd == CommandMessage.COMMAND_PLAY_FIRST_ASK) {
+			// it is a reply to the prompt for play first question. Get it confirmed from
+			// the other player.
+			sendCommand(userInfo.getBuddy(), new CommandMessage(CommandMessage.COMMAND_PLAY_FIRST_CONFIRM, cmdData.getData()));
+		} else if (cmd == CommandMessage.COMMAND_PLAY_FIRST_CONFIRM) {
+			handleCommandPlayFirstConfirm(username, cmdData);
+		} else if (cmd == CommandMessage.COMMAND_MAKE_MOVE) {
+			handleCommandMakeMove(username, cmdData);
+		}
+	}
+	private void handleCommandMakeMove(String username, CommandData cmdData) {
+		UserInfo userInfo = sessions.get(username);
+		CommandMessage cmdMsg = new CommandMessage(cmdData.getCommand(), cmdData.getData());
+		sendCommand(userInfo.getBuddy(), cmdMsg);
+	}
+
+	private void handleCommandPlayFirstConfirm(String username, CommandData cmdData) {
+		UserInfo userInfo = sessions.get(username);
+
+		// get the response from data
+		String resp = cmdData.getData().get("response");
+		// get the command which was sent
+		CommandMessage sentMsg = userInfo.getGameInfo().getLastMessage().getMessage();
+		String playFirst = sentMsg.getPayload().getData().get("playFirst");
+		if (!playFirst.equals(username) && !playFirst.equals(userInfo.getBuddy())) {
+			// value should be a username
+			throw new IllegalStateException("playFirst element value must be a player name");
+		}
+		if (resp.equals("reject")) {
+			// send new proposal to buddy
+			playFirst = playFirst.equals(username) ? userInfo.getBuddy() : username;
+			sentMsg.getPayload().getData().put("playFirst", playFirst);
+			sendCommand(userInfo.getBuddy(), sentMsg);
+		} else {
+			// start game
+			GameInfo gameInfo = userInfo.getGameInfo();
+			// playing first is white and other is black
+			String blackPayer = playFirst.equals(username) ? userInfo.getBuddy() : username;
+			String userColor = playFirst.equals(username) ? "white" : "black";
+			String buddyColor = playFirst.equals(userInfo.getBuddy()) ? "white" : "black";
+			gameInfo.setWhitePlayer(playFirst);
+			gameInfo.setBlackPlayer(blackPayer);
+			Map<String, String> newCmdData = new HashMap<>();
+			newCmdData.put("initialFen", TEST_INTIAL_FEN);
+			CommandMessage cmdMsg = new CommandMessage(CommandMessage.COMMAND_PLAY_START, newCmdData);
+			// send start msg to both
+			newCmdData.put("color", userColor);
+			sendCommand(username, cmdMsg);
+			newCmdData.put("color", buddyColor);
+			sendCommand(userInfo.getBuddy(), cmdMsg);
+		}
+
+	}
+
+	private void sendOK(Session session, String player) {
+		log.info("{} sent OK", player);
 		sendInfoMessage(session, "OK", "OK");
 	}
 
@@ -142,10 +175,12 @@ public class GameController {
 		InfoMessage msg = new InfoMessage(code, message);
 		sendMessage(session, msg);
 	}
+
 	private void sendCommand(String payer, Integer command) {
 		CommandMessage msg = new CommandMessage(command, null);
 		sendCommand(payer, msg);
 	}
+
 	private void sendCommand(String player, CommandMessage msg) {
 		UserInfo userInfo = sessions.get(player);
 		LastMessage lastMsg = new LastMessage(msg, player, System.nanoTime());
@@ -195,7 +230,6 @@ public class GameController {
 				userInfo.setGameInfo(gameInfo);
 			}
 		}
-		sendOK(session);
 	}
 
 	private void initiateGame(UserInfo userInfo) {

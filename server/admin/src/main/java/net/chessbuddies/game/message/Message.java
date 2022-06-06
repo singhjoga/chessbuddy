@@ -6,7 +6,7 @@ public abstract class Message<T> {
 	public static final int MESSAGE_TYPE_GAME_INITIATE=1;
 	public static final int MESSAGE_TYPE_COMMAND=2;
 	public static final int MESSAGE_TYPE_COMMAND_RESPONSE=3;
-	public static final int MESSAGE_TYPE_GAME_MOVE_REQUEST=4;
+	public static final int MESSAGE_TYPE_GAME_MOVE=4;
 	public static final int MESSAGE_TYPE_GAME_MOVE_RESPONSE=5;
 	
 	private Integer type;

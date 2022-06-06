@@ -4,9 +4,6 @@ import java.util.Map;
 
 
 public class CommandResponseMessage extends Message<CommandData>{
-	public static final int COMMAND_PLAY_FIRST_ASK=1;
-	public static final int COMMAND_PLAY_FIRST_CONFIRM=2;
-	
 	public CommandResponseMessage() {
 		this(null, null);
 	}
