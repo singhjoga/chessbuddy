@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:app/common/model/move.dart';
-import 'package:app/common/service/http-client.dart';
+import 'package:app/common/service/http_client.dart';
 import 'package:chess/chess.dart' as chess;
 import 'package:flutter/material.dart';
 class GameState{

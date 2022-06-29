@@ -26,7 +26,7 @@ import net.chessbuddies.system.language.LanguageService;
 import net.chessbuddies.system.refdata.RefData;
 import net.chessbuddies.system.refdata.RefDataService;
 
-@Path("/system")
+@Path("/api/v1/system")
 @Singleton
 @Tag(name = "System")
 @Produces(MediaType.APPLICATION_JSON)
